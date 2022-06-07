@@ -1,4 +1,5 @@
 import pygame
+import moves
 
 SIZE = (800, 800)
 SQUARE_WIDTH = SIZE[0] / 8
@@ -50,11 +51,15 @@ def draw_board():
                 pygame.draw.rect(screen, (255, 125, 0), square)
 
 
-def handle_move(initial_pos, ending_pos):
-    init_x, init_y = initial_pos[0]//100, initial_pos[1]//100
-    end_x, end_y = ending_pos[0]//100, ending_pos[1]//100
-    board_array[end_y][end_x] = board_array[init_y][init_x]
-    board_array[init_y][init_x] = '--'
+def handle_move(initial_position, ending_position):
+    init_x, init_y = initial_position[0]//100, initial_position[1]//100
+    end_x, end_y = ending_position[0]//100, ending_position[1]//100
+    # board_array[end_y][end_x] = board_array[init_y][init_x]
+    # noinspection PyTypeChecker
+    moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x))
+    # print(end_y, end_x)
+    # board_array[init_y][init_x] = '--'
+    # print(board_array[end_y][end_x])
 
 
 count = 0
