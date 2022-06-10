@@ -1,20 +1,33 @@
 from typing import List, Tuple
 
 
-def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int], end_cords: Tuple[int]) -> bool:
-    return True
+def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, int],
+                          end_cords: Tuple[int, int]) -> bool:
+    if not check_ending_square(board_state, init_cords, end_cords):
+        return False
+
+    piece_symbol = board_state[init_cords[0]][init_cords[1]][1]
+
+    if piece_symbol == 'n':
+        y_movement, x_movement = get_y_and_x_movement(init_cords, end_cords)
+        return validate_knight_move(y_movement, x_movement)
+    elif piece_symbol == 'b':
+        movement = get_y_and_x_movement(init_cords, end_cords)
+        return validate_bishop_move(board_state, init_cords, movement)
+
+    return False
 
 
-def validate_knight_move(init_cords: Tuple[int], end_cords: Tuple[int]) -> bool:
-    if abs(init_cords[0] - end_cords[0]) == 2 and abs(init_cords[1] - end_cords[1]) == 1:
+def validate_knight_move(y_movement: int, x_movement: int) -> bool:
+    if abs(y_movement) == 2 and abs(x_movement) == 1:
         return True
-    elif abs(init_cords[0] - end_cords[0]) == 1 and abs(init_cords[1] - end_cords[1]) == 2:
+    elif abs(y_movement) == 1 and abs(x_movement) == 2:
         return True
     else:
         return False
 
 
-def get_y_and_x_movement(init_cords: Tuple[int], end_cords: Tuple[int]) -> Tuple[int, int]:
+def get_y_and_x_movement(init_cords: Tuple[int, int], end_cords: Tuple[int, int]) -> Tuple[int, int]:
     y_movement = init_cords[0] - end_cords[0]
     x_movement = init_cords[1] - end_cords[1]
     return y_movement, x_movement
@@ -35,7 +48,7 @@ def get_move_direction(y_movement: int, x_movement: int) -> Tuple[int, int]:
     return move_direction
 
 
-def validate_bishop_move(board_state: List[List[str]], init_cords: Tuple[int], movement: Tuple[int, int]) -> bool:
+def validate_bishop_move(board_state: List[List[str]], init_cords: Tuple[int, int], movement: Tuple[int, int]) -> bool:
     y_movement, x_movement = movement
 
     if abs(x_movement) != abs(y_movement):
@@ -49,7 +62,7 @@ def validate_bishop_move(board_state: List[List[str]], init_cords: Tuple[int], m
     return True
 
 
-def check_ending_square(board_state: List[List[str]], init_cords: Tuple[int], end_cords: Tuple[int]) -> bool:
+def check_ending_square(board_state: List[List[str]], init_cords: Tuple[int, int], end_cords: Tuple[int, int]) -> bool:
     moving_piece_color = board_state[init_cords[0]][init_cords[1]][0]
     ending_square_piece_color = board_state[end_cords[0]][end_cords[1]][0]
 

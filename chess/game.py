@@ -2,8 +2,8 @@ import pygame
 import moves
 
 SIZE = (800, 800)
-SQUARE_WIDTH = SIZE[0] / 8
-SQUARE_HEIGHT = SIZE[1] / 8
+SQUARE_WIDTH = SIZE[0] // 8
+SQUARE_HEIGHT = SIZE[1] // 8
 IMAGES = {}
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
@@ -52,20 +52,27 @@ def draw_board():
 
 
 def handle_move(initial_position, ending_position):
-    init_x, init_y = initial_position[0]//100, initial_position[1]//100
-    end_x, end_y = ending_position[0]//100, ending_position[1]//100
-    # board_array[end_y][end_x] = board_array[init_y][init_x]
-    # noinspection PyTypeChecker
-    moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x))
-    # print(end_y, end_x)
-    # board_array[init_y][init_x] = '--'
-    # print(board_array[end_y][end_x])
+    init_x, init_y = initial_position[0]//SQUARE_WIDTH, initial_position[1]//SQUARE_HEIGHT
+    end_x, end_y = ending_position[0]//SQUARE_WIDTH, ending_position[1]//SQUARE_HEIGHT
+    if moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x)):
+        board_array[end_y][end_x] = board_array[init_y][init_x]
+        board_array[init_y][init_x] = '--'
+
+
+def highlight_square(cords):
+    left = cords[0] // SQUARE_WIDTH * SQUARE_WIDTH
+    top = cords[1] // SQUARE_HEIGHT * SQUARE_HEIGHT
+    square = pygame.Rect(left, top, SQUARE_WIDTH, SQUARE_HEIGHT)
+    pygame.draw.rect(screen, (0, 255, 100), square)
 
 
 count = 0
 load_images()
-while running:
+draw_board()
+draw_pieces()
+pygame.display.update()
 
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -74,13 +81,16 @@ while running:
             if count == 0:
                 initial_pos = event.pos
                 count += 1
+                draw_board()
+                highlight_square(initial_pos)
+                draw_pieces()
             elif count == 1:
                 ending_pos = event.pos
                 count = 0
                 handle_move(initial_pos, ending_pos)
+                draw_board()
+                draw_pieces()
 
-    draw_board()
-    draw_pieces()
     pygame.display.update()
 
 pygame.quit()
