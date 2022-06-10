@@ -14,8 +14,33 @@ def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, i
     elif piece_symbol == 'b':
         movement = get_y_and_x_movement(init_cords, end_cords)
         return validate_bishop_move(board_state, init_cords, movement)
+    elif piece_symbol == 'r':
+        movement = get_y_and_x_movement(init_cords, end_cords)
+        return validate_rook_move(board_state, init_cords, movement)
+    elif piece_symbol == 'q':
+        movement = get_y_and_x_movement(init_cords, end_cords)
+        return validate_rook_move(board_state, init_cords, movement) or validate_bishop_move(board_state, init_cords,
+                                                                                             movement)
 
     return False
+
+
+def validate_rook_move(board_state: List[List[str]], init_cords: Tuple[int, int], movement: Tuple[int, int]):
+    y_movement, x_movement = movement
+
+    if y_movement and x_movement:
+        return False
+
+    move_direction = get_move_direction(y_movement, x_movement)
+    init_y, init_x = init_cords
+
+    for i in range(max(abs(y_movement), abs(x_movement)) - 1):
+        init_y += move_direction[0]
+        init_x += move_direction[1]
+        if board_state[init_y][init_x] != '--':
+            return False
+
+    return True
 
 
 def validate_knight_move(y_movement: int, x_movement: int) -> bool:
@@ -44,6 +69,14 @@ def get_move_direction(y_movement: int, x_movement: int) -> Tuple[int, int]:
         move_direction = (1, 1)
     elif y_movement < 0 and x_movement > 0:
         move_direction = (1, -1)
+    elif y_movement < 0 and x_movement == 0:
+        move_direction = (1, 0)
+    elif y_movement > 0 and x_movement == 0:
+        move_direction = (-1, 0)
+    elif y_movement == 0 and x_movement < 0:
+        move_direction = (0, 1)
+    elif y_movement == 0 and x_movement > 0:
+        move_direction = (0, -1)
 
     return move_direction
 
@@ -56,8 +89,11 @@ def validate_bishop_move(board_state: List[List[str]], init_cords: Tuple[int, in
 
     move_direction = get_move_direction(y_movement, x_movement)
 
+    init_y, init_x = init_cords
     for i in range(abs(x_movement) - 1):
-        if board_state[init_cords[0] + move_direction[0]][init_cords[1] + move_direction[1]] != '--':
+        init_y += move_direction[0]
+        init_x += move_direction[1]
+        if board_state[init_y][init_x] != '--':
             return False
     return True
 
