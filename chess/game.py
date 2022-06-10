@@ -7,6 +7,7 @@ SQUARE_HEIGHT = SIZE[1] // 8
 IMAGES = {}
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
+move_feed = []
 
 running = True
 
@@ -57,6 +58,8 @@ def handle_move(initial_position, ending_position):
     if moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x)):
         board_array[end_y][end_x] = board_array[init_y][init_x]
         board_array[init_y][init_x] = '--'
+        move_feed.append(((init_y, init_x), (end_y, end_x)))
+        print(move_feed)
 
 
 def highlight_square(cords):
@@ -90,7 +93,6 @@ while running:
                 handle_move(initial_pos, ending_pos)
                 draw_board()
                 draw_pieces()
-
     pygame.display.update()
 
 pygame.quit()

@@ -21,8 +21,16 @@ def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, i
         movement = get_y_and_x_movement(init_cords, end_cords)
         return validate_rook_move(board_state, init_cords, movement) or validate_bishop_move(board_state, init_cords,
                                                                                              movement)
+    elif piece_symbol == 'k':
+        movement = get_y_and_x_movement(init_cords, end_cords)
+        return basic_king_move_validation(movement)
 
     return False
+
+
+def basic_king_move_validation(movement: Tuple[int, int]):
+    y_movement, x_movement = movement
+    return y_movement <= 1 and x_movement <= 1
 
 
 def validate_rook_move(board_state: List[List[str]], init_cords: Tuple[int, int], movement: Tuple[int, int]):
