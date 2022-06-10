@@ -1,8 +1,8 @@
 import pygame
 import moves
 
-SIZE = (800, 800)
-SQUARE_WIDTH = SIZE[0] // 8
+SIZE = (1000, 800)
+SQUARE_WIDTH = int(0.8 * SIZE[0] // 8)
 SQUARE_HEIGHT = SIZE[1] // 8
 IMAGES = {}
 pygame.init()
@@ -59,7 +59,6 @@ def handle_move(initial_position, ending_position):
         board_array[end_y][end_x] = board_array[init_y][init_x]
         board_array[init_y][init_x] = '--'
         move_feed.append(((init_y, init_x), (end_y, end_x)))
-        print(move_feed)
 
 
 def highlight_square(cords):
@@ -69,10 +68,16 @@ def highlight_square(cords):
     pygame.draw.rect(screen, (0, 255, 100), square)
 
 
+def draw_sidebar():
+    square = pygame.Rect(0.8 * SIZE[0], 0, 0.2 * SIZE[0], SIZE[1])
+    pygame.draw.rect(screen, (0, 255, 100), square)
+
+
 count = 0
 load_images()
 draw_board()
 draw_pieces()
+draw_sidebar()
 pygame.display.update()
 
 while running:
