@@ -1,9 +1,13 @@
 from typing import List, Tuple
+from pieces.pawn import Pawn
 
 
 def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, int],
-                          end_cords: Tuple[int, int]) -> bool:
-    if not check_ending_square(board_state, init_cords, end_cords):
+                          end_cords: Tuple[int, int],
+                          move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]]) -> bool:
+    piece_color = board_state[init_cords[0]][init_cords[1]][0]
+    ending_square_piece_color = board_state[end_cords[0]][end_cords[1]][0]
+    if piece_color == ending_square_piece_color:
         return False
 
     piece_symbol = board_state[init_cords[0]][init_cords[1]][1]
@@ -23,12 +27,62 @@ def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, i
                                                                                              movement)
     elif piece_symbol == 'k':
         movement = get_y_and_x_movement(init_cords, end_cords)
-        return basic_king_move_validation(movement)
+        return validate_basic_king_move(movement)
+    elif piece_symbol == 'p':
+        movement = get_y_and_x_movement(init_cords, end_cords)
+        return validate_basic_pawn_move(init_cords, movement, piece_color,
+                                        ending_square_piece_color) or validate_pawn_capture(
+            board_state, init_cords, end_cords)
 
     return False
 
 
-def basic_king_move_validation(movement: Tuple[int, int]):
+def validate_basic_pawn_move(init_cords: Tuple[int, int], movement: Tuple[int, int], pawn_color: str,
+                             ending_square_piece_color: str) -> bool:
+    y_movement, x_movement = movement
+
+    if x_movement:
+        return False
+
+    if ending_square_piece_color != '-':
+        return False
+
+    if pawn_color == 'W':
+        if y_movement == 2 and Pawn.has_pawn_moved(init_cords, pawn_color):
+            return False
+        if y_movement > 2 or y_movement < 0:
+            return False
+
+    if pawn_color == 'B':
+        if y_movement == -2 and Pawn.has_pawn_moved(init_cords, pawn_color):
+            return False
+        if y_movement < -2 or y_movement > 0:
+            return False
+
+    return True
+
+
+def validate_pawn_capture(board_state: List[List[str]], init_cords: Tuple[int, int],
+                          end_cords: Tuple[int, int]) -> bool:
+    y_movement, x_movement = get_y_and_x_movement(init_cords, end_cords)
+    pawn_color = board_state[init_cords[0]][init_cords[1]][0]
+    captured_piece_color = board_state[end_cords[0]][end_cords[1]][0]
+    if pawn_color == 'W':
+        if y_movement != 1 or x_movement not in [-1, 1]:
+            return False
+        if captured_piece_color != 'B':
+            return False
+
+    elif pawn_color == 'B':
+        if y_movement != -1 or x_movement not in [-1, 1]:
+            return False
+        if captured_piece_color != 'W':
+            return False
+
+    return True
+
+
+def validate_basic_king_move(movement: Tuple[int, int]):
     y_movement, x_movement = movement
     return y_movement <= 1 and x_movement <= 1
 
@@ -104,10 +158,3 @@ def validate_bishop_move(board_state: List[List[str]], init_cords: Tuple[int, in
         if board_state[init_y][init_x] != '--':
             return False
     return True
-
-
-def check_ending_square(board_state: List[List[str]], init_cords: Tuple[int, int], end_cords: Tuple[int, int]) -> bool:
-    moving_piece_color = board_state[init_cords[0]][init_cords[1]][0]
-    ending_square_piece_color = board_state[end_cords[0]][end_cords[1]][0]
-
-    return moving_piece_color != ending_square_piece_color

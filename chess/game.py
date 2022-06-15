@@ -35,7 +35,8 @@ def draw_pieces():
         for j in range(8):
             piece = board_array[i][j]
             if piece != '--':
-                screen.blit(IMAGES[piece], pygame.Rect(SQUARE_WIDTH * j, SQUARE_HEIGHT * i, SQUARE_WIDTH, SQUARE_HEIGHT))
+                screen.blit(IMAGES[piece],
+                            pygame.Rect(SQUARE_WIDTH * j, SQUARE_HEIGHT * i, SQUARE_WIDTH, SQUARE_HEIGHT))
 
 
 def draw_board():
@@ -53,9 +54,9 @@ def draw_board():
 
 
 def handle_move(initial_position, ending_position):
-    init_x, init_y = initial_position[0]//SQUARE_WIDTH, initial_position[1]//SQUARE_HEIGHT
-    end_x, end_y = ending_position[0]//SQUARE_WIDTH, ending_position[1]//SQUARE_HEIGHT
-    if moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x)):
+    init_x, init_y = initial_position[0] // SQUARE_WIDTH, initial_position[1] // SQUARE_HEIGHT
+    end_x, end_y = ending_position[0] // SQUARE_WIDTH, ending_position[1] // SQUARE_HEIGHT
+    if moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x), move_feed):
         board_array[end_y][end_x] = board_array[init_y][init_x]
         board_array[init_y][init_x] = '--'
         move_feed.append(((init_y, init_x), (end_y, end_x)))
