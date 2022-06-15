@@ -58,13 +58,22 @@ def handle_move(initial_position, ending_position):
     end_x, end_y = ending_position[0] // SQUARE_WIDTH, ending_position[1] // SQUARE_HEIGHT
     piece = board_array[init_y][init_x][1]
     if piece == 'k' and (
-            king_and_rook_cords := moves.validate_king_move(board_array, (init_y, init_x), (end_y, end_x), move_feed)):
+            king_and_rook_cords := moves.validate_castles(board_array, (init_y, init_x), (end_y, end_x), move_feed)):
+
         perform_castles(king_and_rook_cords, (init_y, init_x))
+        return board_array[end_y][end_x][0]
 
     elif moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x)):
         board_array[end_y][end_x] = board_array[init_y][init_x]
         board_array[init_y][init_x] = '--'
         move_feed.append(((init_y, init_x), (end_y, end_x)))
+        return board_array[end_y][end_x][0]
+
+
+def get_piece_color(initial_position):
+    init_x, init_y = initial_position[0] // SQUARE_WIDTH, initial_position[1] // SQUARE_HEIGHT
+    color = board_array[init_y][init_x][0]
+    return color
 
 
 def perform_castles(king_and_rook_cords, init_king_cords):
@@ -97,6 +106,7 @@ draw_board()
 draw_pieces()
 draw_sidebar()
 pygame.display.update()
+last_color_moved = 'B'
 
 while running:
     for event in pygame.event.get():
@@ -106,16 +116,26 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if count == 0:
                 initial_pos = event.pos
-                count += 1
-                draw_board()
-                highlight_square(initial_pos)
-                draw_pieces()
+
+                if last_color_moved == 'B' and get_piece_color(initial_pos) == 'W':
+                    count += 1
+                    draw_board()
+                    highlight_square(initial_pos)
+                    draw_pieces()
+
+                elif last_color_moved == 'W' and get_piece_color(initial_pos) == 'B':
+                    count += 1
+                    draw_board()
+                    highlight_square(initial_pos)
+                    draw_pieces()
             elif count == 1:
                 ending_pos = event.pos
                 count = 0
-                handle_move(initial_pos, ending_pos)
+                if handle_move(initial_pos, ending_pos):
+                    last_color_moved = get_piece_color(ending_pos)
                 draw_board()
                 draw_pieces()
+
     pygame.display.update()
 
 pygame.quit()

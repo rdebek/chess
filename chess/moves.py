@@ -30,6 +30,9 @@ def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, i
         return validate_basic_pawn_move(init_cords, movement, piece_color,
                                         ending_square_piece_color) or validate_pawn_capture(
             board_state, init_cords, end_cords)
+    elif piece_symbol == 'k':
+        movement = get_y_and_x_movement(init_cords, end_cords)
+        return validate_basic_king_move(movement)
 
     return False
 
@@ -79,12 +82,11 @@ def validate_pawn_capture(board_state: List[List[str]], init_cords: Tuple[int, i
     return True
 
 
-def validate_king_move(board_state: List[List[str]], init_cords: Tuple[int, int],
-                       end_cords: Tuple[int, int], move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]]) -> \
+def validate_castles(board_state: List[List[str]], init_cords: Tuple[int, int],
+                     end_cords: Tuple[int, int], move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]]) -> \
         Union[bool, Tuple[Tuple[int, int], Tuple[int, int], str]]:
-
     movement = get_y_and_x_movement(init_cords, end_cords)
-    if validate_basic_king_move(movement) or validate_king_castle(board_state, init_cords, movement, move_history):
+    if validate_king_castle(board_state, init_cords, movement, move_history):
         if movement[1] > 0:
             return (init_cords[0], init_cords[1] - 2), (init_cords[0], init_cords[1] - 1), 'O-O-O'
         elif movement[1] < 0:
