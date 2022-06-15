@@ -8,7 +8,7 @@ class King:
 
         king_color = board_state[init_cords[0]][init_cords[1]][0]
 
-        if not King.check_history(move_history, king_color):
+        if not King.check_history(move_history, king_color, x_movement):
             return False
 
         if king_color == 'W':
@@ -36,13 +36,14 @@ class King:
         return True
 
     @staticmethod
-    def check_history(move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]], king_color: str) -> bool:
+    def check_history(move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]], king_color: str,
+                      x_movement: int) -> bool:
         if king_color == 'W':
             for move in move_history:
-                if move[0] == (7, 4):
+                if move[0] == (7, 4) or (move[0] == (7, 7) and x_movement < 0) or (move[0] == (7, 0) and x_movement > 0):
                     return False
         elif king_color == 'B':
             for move in move_history:
-                if move[0] == (0, 4):
+                if move[0] == (0, 4) or (move[0] == (0, 7) and x_movement < 0) or (move[0] == (0, 0) and x_movement > 0):
                     return False
         return True
