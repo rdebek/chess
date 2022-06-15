@@ -56,10 +56,27 @@ def draw_board():
 def handle_move(initial_position, ending_position):
     init_x, init_y = initial_position[0] // SQUARE_WIDTH, initial_position[1] // SQUARE_HEIGHT
     end_x, end_y = ending_position[0] // SQUARE_WIDTH, ending_position[1] // SQUARE_HEIGHT
-    if moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x), move_feed):
+    piece = board_array[init_y][init_x][1]
+    if piece == 'k' and (
+            king_and_rook_cords := moves.validate_king_move(board_array, (init_y, init_x), (end_y, end_x), move_feed)):
+        perform_castles(king_and_rook_cords, (init_y, init_x))
+
+    elif moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x)):
         board_array[end_y][end_x] = board_array[init_y][init_x]
         board_array[init_y][init_x] = '--'
         move_feed.append(((init_y, init_x), (end_y, end_x)))
+
+
+def perform_castles(king_and_rook_cords, init_king_cords):
+    init_y, init_x = init_king_cords
+    king_cords, rook_cords, side = king_and_rook_cords
+    board_array[king_cords[0]][king_cords[1]] = board_array[init_y][init_x]
+    board_array[rook_cords[0]][rook_cords[1]] = board_array[rook_cords[0]][7]
+    board_array[init_y][init_x] = '--'
+    if side == 'O-O':
+        board_array[rook_cords[0]][7] = '--'
+    elif side == 'O-O-O':
+        board_array[rook_cords[0]][0] = '--'
 
 
 def highlight_square(cords):

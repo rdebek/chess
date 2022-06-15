@@ -1,10 +1,10 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from pieces.pawn import Pawn
+from pieces.king import King
 
 
 def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, int],
-                          end_cords: Tuple[int, int],
-                          move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]]) -> bool:
+                          end_cords: Tuple[int, int]) -> bool:
     piece_color = board_state[init_cords[0]][init_cords[1]][0]
     ending_square_piece_color = board_state[end_cords[0]][end_cords[1]][0]
     if piece_color == ending_square_piece_color:
@@ -25,9 +25,6 @@ def basic_move_validation(board_state: List[List[str]], init_cords: Tuple[int, i
         movement = get_y_and_x_movement(init_cords, end_cords)
         return validate_rook_move(board_state, init_cords, movement) or validate_bishop_move(board_state, init_cords,
                                                                                              movement)
-    elif piece_symbol == 'k':
-        movement = get_y_and_x_movement(init_cords, end_cords)
-        return validate_basic_king_move(movement)
     elif piece_symbol == 'p':
         movement = get_y_and_x_movement(init_cords, end_cords)
         return validate_basic_pawn_move(init_cords, movement, piece_color,
@@ -82,12 +79,38 @@ def validate_pawn_capture(board_state: List[List[str]], init_cords: Tuple[int, i
     return True
 
 
-def validate_basic_king_move(movement: Tuple[int, int]):
+def validate_king_move(board_state: List[List[str]], init_cords: Tuple[int, int],
+                       end_cords: Tuple[int, int], move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]]) -> \
+        Union[bool, Tuple[Tuple[int, int], Tuple[int, int], str]]:
+
+    movement = get_y_and_x_movement(init_cords, end_cords)
+    if validate_basic_king_move(movement) or validate_king_castle(board_state, init_cords, movement, move_history):
+        if movement[1] > 0:
+            return (init_cords[0], init_cords[1] - 2), (init_cords[0], init_cords[1] - 1), 'O-O-O'
+        elif movement[1] < 0:
+            return (init_cords[0], init_cords[1] + 2), (init_cords[0], init_cords[1] + 1), 'O-O'
+    return False
+
+
+def validate_basic_king_move(movement: Tuple[int, int]) -> bool:
     y_movement, x_movement = movement
-    return y_movement <= 1 and x_movement <= 1
+    return abs(y_movement) <= 1 and abs(x_movement) <= 1
 
 
-def validate_rook_move(board_state: List[List[str]], init_cords: Tuple[int, int], movement: Tuple[int, int]):
+def validate_king_castle(board_state: List[List[str]], init_cords: Tuple[int, int], movement: Tuple[int, int],
+                         move_history: List[Tuple[Tuple[int, int], Tuple[int, int]]]) -> bool:
+    y_movement, x_movement = movement
+
+    if y_movement:
+        return False
+
+    if (1 < x_movement <= 3) or (-1 > x_movement >= -4):
+        return King.can_castle(board_state, init_cords, x_movement, move_history)
+
+    return False
+
+
+def validate_rook_move(board_state: List[List[str]], init_cords: Tuple[int, int], movement: Tuple[int, int]) -> bool:
     y_movement, x_movement = movement
 
     if y_movement and x_movement:
