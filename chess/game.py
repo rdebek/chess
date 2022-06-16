@@ -1,5 +1,8 @@
 import pygame
 import moves
+from typing import List
+from pieces.king import King
+import copy
 
 SIZE = (1000, 800)
 SQUARE_WIDTH = int(0.8 * SIZE[0] // 8)
@@ -65,10 +68,14 @@ def handle_move(initial_position, ending_position):
         return color
 
     elif moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x)):
-        board_array[end_y][end_x] = board_array[init_y][init_x]
-        board_array[init_y][init_x] = '--'
-        move_feed.append(((init_y, init_x), (end_y, end_x)))
-        return color
+        temp_board = copy.deepcopy(board_array)
+        temp_board[end_y][end_x] = temp_board[init_y][init_x]
+        temp_board[init_y][init_x] = '--'
+        if not King.is_in_check(temp_board, color):
+            board_array[end_y][end_x] = board_array[init_y][init_x]
+            board_array[init_y][init_x] = '--'
+            move_feed.append(((init_y, init_x), (end_y, end_x)))
+            return color
 
 
 def get_piece_color(initial_position):
@@ -108,6 +115,7 @@ draw_pieces()
 draw_sidebar()
 pygame.display.update()
 last_color_moved = 'B'
+
 
 while running:
     for event in pygame.event.get():

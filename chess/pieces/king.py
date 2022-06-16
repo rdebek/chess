@@ -58,6 +58,7 @@ class King:
                 if column == f'{king_color}k':
                     king_position = (i, j)
                     break
+        return not (King.verify_pawn_checks(board_state, king_position) and King.verify_diagonal_checks(board_state, king_position) and King.verify_row_checks(board_state, king_position))
 
     @staticmethod
     def verify_pawn_checks(board_state: List[List[str]], king_position: Tuple[int, int]) -> bool:
