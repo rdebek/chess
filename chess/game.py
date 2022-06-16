@@ -57,17 +57,18 @@ def handle_move(initial_position, ending_position):
     init_x, init_y = initial_position[0] // SQUARE_WIDTH, initial_position[1] // SQUARE_HEIGHT
     end_x, end_y = ending_position[0] // SQUARE_WIDTH, ending_position[1] // SQUARE_HEIGHT
     piece = board_array[init_y][init_x][1]
+    color = board_array[init_y][init_x][0]
     if piece == 'k' and (
             king_and_rook_cords := moves.validate_castles(board_array, (init_y, init_x), (end_y, end_x), move_feed)):
 
         perform_castles(king_and_rook_cords, (init_y, init_x))
-        return board_array[end_y][end_x][0]
+        return color
 
     elif moves.basic_move_validation(board_array, (init_y, init_x), (end_y, end_x)):
         board_array[end_y][end_x] = board_array[init_y][init_x]
         board_array[init_y][init_x] = '--'
         move_feed.append(((init_y, init_x), (end_y, end_x)))
-        return board_array[end_y][end_x][0]
+        return color
 
 
 def get_piece_color(initial_position):
@@ -117,13 +118,8 @@ while running:
             if count == 0:
                 initial_pos = event.pos
 
-                if last_color_moved == 'B' and get_piece_color(initial_pos) == 'W':
-                    count += 1
-                    draw_board()
-                    highlight_square(initial_pos)
-                    draw_pieces()
-
-                elif last_color_moved == 'W' and get_piece_color(initial_pos) == 'B':
+                if (last_color_moved == 'B' and get_piece_color(initial_pos) == 'W') or (
+                        last_color_moved == 'W' and get_piece_color(initial_pos) == 'B'):
                     count += 1
                     draw_board()
                     highlight_square(initial_pos)
@@ -131,8 +127,8 @@ while running:
             elif count == 1:
                 ending_pos = event.pos
                 count = 0
-                if handle_move(initial_pos, ending_pos):
-                    last_color_moved = get_piece_color(ending_pos)
+                if color := handle_move(initial_pos, ending_pos):
+                    last_color_moved = color
                 draw_board()
                 draw_pieces()
 
