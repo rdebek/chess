@@ -58,7 +58,7 @@ class King:
                 if column == f'{king_color}k':
                     king_position = (i, j)
                     break
-        return not (King.verify_pawn_checks(board_state, king_position) and King.verify_diagonal_checks(board_state, king_position) and King.verify_row_checks(board_state, king_position))
+        return not (King.verify_pawn_checks(board_state, king_position) and King.verify_diagonal_checks(board_state, king_position) and King.verify_row_checks(board_state, king_position) and King.verify_knight_checks(board_state, king_position))
 
     @staticmethod
     def verify_pawn_checks(board_state: List[List[str]], king_position: Tuple[int, int]) -> bool:
@@ -109,4 +109,17 @@ class King:
                 return True
             current_y += dir_y
             current_x += dir_x
+        return True
+
+    @staticmethod
+    def verify_knight_checks(board_state: List[List[str]], king_position: Tuple[int, int]) -> bool:
+        king_y, king_x = king_position
+        king_color = board_state[king_y][king_x][0]
+        enemy_color = 'B' if king_color == 'W' else 'W'
+        possible_directions = [(1, 2), (-1, 2), (2, 1), (-2, 1), (-1, -2), (1, -2), (-2, -1), (2, -1)]
+        for direction in possible_directions:
+            current_y, current_x = king_y + direction[0], king_x + direction[1]
+            if 0 <= current_y <= 7 and 0 <= current_x <= 7:
+                if board_state[current_y][current_x] == f'{enemy_color}n':
+                    return False
         return True
